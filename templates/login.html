@@ -1,0 +1,93 @@
+<html lang="en">
+  <head>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <style>
+        .button {
+          background-color: rgb(156, 40, 40); 
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          cursor: pointer;
+          -webkit-transition-duration: 0.4s; /* Safari */
+          transition-duration: 0.4s;
+        }
+
+        
+        .google:hover {
+          box-shadow: 0 12px 16px 0 rgba(216, 213, 213, 0.479),0 17px 50px 0 rgba(138, 136, 136, 0.19);
+        }
+
+        .square {
+          width: 500px;
+          height: 300px;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        </style>
+    
+    <script>
+      function start() {
+        gapi.load('auth2', function() {
+          auth2 = gapi.auth2.init({
+            client_id: '486620334188-78baitclphllt1uj90q859vs1608imtv.apps.googleusercontent.com'
+          });
+        });
+      }
+    </script>
+
+
+    
+
+  </head>
+  <body style="background-color:rgb(0, 0, 0);">
+    <div class="square">
+      <h3 style="color:rgb(156, 156, 156)">Login with Your Google Account</h3>
+      <button id="signinButton" class="button google">Google sign in</button>
+      
+    </div>
+    <div id="result" style="color: rgb(180, 18, 18)"></div>
+    <script>
+      $('#signinButton').click(function() {
+        function signInCallback(authResult){
+          if (authResult['code']){
+            $('.square').attr('style', 'display: none');
+            $.ajax({
+              type: 'POST',
+              url: '/gconnect?state={{STATE}}',
+              headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+              },
+              contentType: 'application/octet-stream; charset=utf-8',
+              success:function(result){
+                $('#result').html('Login Successful!</br>'+ result + '</br></br></br>Redirecting...')
+                      setTimeout(function() {
+                      window.location.href = "/";
+                      }, 4000);
+              },
+              processData:false,
+              data:authResult['code']
+            });
+          } else{
+            // handle error
+            console.log('There was an error: ' + authResult['error']);
+            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+          }
+        }
+        auth2.grantOfflineAccess().then(signInCallback);
+      });
+  </script>
+
+      
+  </body>
+</html>
